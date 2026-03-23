@@ -4,15 +4,16 @@ pragma solidity ^0.8.20;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Burnable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract YourCollectible is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
+contract YourCollectible is ERC721, ERC721Enumerable, ERC721URIStorage, ERC721Burnable, Ownable {
     uint256 public tokenIdCounter;
 
     constructor() ERC721("YourCollectible", "YCB") Ownable(msg.sender) {}
 
     function _baseURI() internal pure override returns (string memory) {
-        return "https://ipfs.io/ipfs/";
+        return "https://gateway.pinata.cloud/ipfs/";
     }
 
     function mintItem(address to, string memory uri) public returns (uint256) {
@@ -21,6 +22,24 @@ contract YourCollectible is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable 
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         return tokenId;
+    }
+
+    function airdropMint(address[] memory recipients, string memory uri) public {
+        for (uint256 i = 0; i < recipients.length; i++) {
+            tokenIdCounter++;
+            uint256 tokenId = tokenIdCounter;
+            _safeMint(recipients[i], tokenId);
+            _setTokenURI(tokenId, uri);
+        }
+    }
+
+    function batchMintItem(address to, string[] memory uris) public {
+        for (uint256 i = 0; i < uris.length; i++) {
+            tokenIdCounter++;
+            uint256 tokenId = tokenIdCounter;
+            _safeMint(to, tokenId);
+            _setTokenURI(tokenId, uris[i]);
+        }
     }
 
     // Override functions from OpenZeppelin ERC721, ERC721Enumerable and ERC721URIStorage

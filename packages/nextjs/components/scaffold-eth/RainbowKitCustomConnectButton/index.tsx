@@ -29,20 +29,10 @@ export const RainbowKitCustomConnectButton = () => {
 
         return (
           <>
-            {(() => {
-              if (!connected) {
-                return (
-                  <button className="btn btn-primary btn-sm" onClick={openConnectModal} type="button">
-                    Connect Wallet
-                  </button>
-                );
-              }
-
-              if (chain.unsupported || chain.id !== targetNetwork.id) {
-                return <WrongNetworkDropdown />;
-              }
-
-              return (
+            {connected ? (
+              chain.unsupported || chain.id !== targetNetwork.id ? (
+                <WrongNetworkDropdown />
+              ) : (
                 <>
                   <div className="flex flex-col items-center mr-1">
                     <Balance address={account.address as Address} className="min-h-0 h-auto" />
@@ -59,8 +49,10 @@ export const RainbowKitCustomConnectButton = () => {
                   <AddressQRCodeModal address={account.address as Address} modalId="qrcode-modal" />
                   <RevealBurnerPKModal />
                 </>
-              );
-            })()}
+              )
+            ) : (
+              <ConnectButton />
+            )}
           </>
         );
       }}

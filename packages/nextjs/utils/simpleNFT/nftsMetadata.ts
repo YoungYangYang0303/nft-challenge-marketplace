@@ -119,6 +119,66 @@ const nftsMetadata = [
       },
     ],
   },
+  {
+    description: "King of the jungle",
+    external_url: "https://austingriffith.com/portfolio/paintings/",
+    image: "https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    name: "Lion",
+    attributes: [
+      {
+        trait_type: "BackgroundColor",
+        value: "yellow",
+      },
+      {
+        trait_type: "Eyes",
+        value: "fierce",
+      },
+      {
+        trait_type: "Stamina",
+        value: 85,
+      },
+    ],
+  },
+  {
+    description: "A cute kitten",
+    external_url: "https://austingriffith.com/portfolio/paintings/",
+    image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    name: "Cat",
+    attributes: [
+      {
+        trait_type: "BackgroundColor",
+        value: "white",
+      },
+      {
+        trait_type: "Eyes",
+        value: "cute",
+      },
+      {
+        trait_type: "Stamina",
+        value: 12,
+      },
+    ],
+  },
+  {
+    description: "A loyal friend",
+    external_url: "https://austingriffith.com/portfolio/paintings/",
+    image: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    name: "Dog",
+    attributes: [
+      {
+        trait_type: "BackgroundColor",
+        value: "brown",
+      },
+      {
+        trait_type: "Eyes",
+        value: "happy",
+      },
+      {
+        trait_type: "Stamina",
+        value: 55,
+      },
+    ],
+  },
 ];
 
 export type NFTMetaData = (typeof nftsMetadata)[number];

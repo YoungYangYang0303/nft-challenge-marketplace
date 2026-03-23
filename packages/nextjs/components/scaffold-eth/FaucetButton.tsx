@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { createWalletClient, http, parseEther } from "viem";
 import { hardhat } from "viem/chains";
 import { useAccount } from "wagmi";
@@ -12,9 +12,10 @@ import { useWatchBalance } from "~~/hooks/scaffold-eth/useWatchBalance";
 const NUM_OF_ETH = "1";
 const FAUCET_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
+const override = scaffoldConfig.rpcOverrides?.[hardhat.id];
 const localWalletClient = createWalletClient({
   chain: hardhat,
-  transport: http(),
+  transport: override ? http(override) : http(),
 });
 
 /**
@@ -26,6 +27,8 @@ export const FaucetButton = () => {
   const { data: balance } = useWatchBalance({ address });
 
   const [loading, setLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   const faucetTxn = useTransactor(localWalletClient);
 
@@ -50,7 +53,7 @@ export const FaucetButton = () => {
     return null;
   }
 
-  const isBalanceZero = balance && balance.value === 0n;
+  const isBalanceZero = mounted && balance && balance.value === 0n;
 
   return (
     <div
@@ -71,3 +74,4 @@ export const FaucetButton = () => {
     </div>
   );
 };
+import scaffoldConfig from "~~/scaffold.config";
