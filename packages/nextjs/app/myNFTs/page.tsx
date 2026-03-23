@@ -1,6 +1,14 @@
 "use client";
 
 import { useState } from "react";
+import {
+  AirdropMinter,
+  BatchNFTMinter,
+  ExcelBatchMinter,
+  MintCustomNFTForm,
+  MyHoldings,
+  MyListings,
+} from "./_components";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
@@ -8,11 +16,10 @@ import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaf
 import { notification } from "~~/utils/scaffold-eth";
 import { addToIPFS } from "~~/utils/simpleNFT/ipfs-fetch";
 import nftsMetadata from "~~/utils/simpleNFT/nftsMetadata";
-import { AirdropMinter, BatchNFTMinter, ExcelBatchMinter, MintCustomNFTForm, MyHoldings, MyListings } from "./_components";
 
 const MyNFTs: NextPage = () => {
   const { address: connectedAddress, isConnected, isConnecting } = useAccount();
-  const [activeTab, setActiveTab] = useState<'holdings' | 'listings'>('holdings');
+  const [activeTab, setActiveTab] = useState<"holdings" | "listings">("holdings");
 
   const { writeContractAsync } = useScaffoldWriteContract({ contractName: "YourCollectible" });
 
@@ -61,7 +68,7 @@ const MyNFTs: NextPage = () => {
           </h1>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 px-5 w-full max-w-7xl mx-auto">
         {/* Column 1: Single Minting */}
         <div className="flex flex-col gap-6 w-full">
@@ -80,10 +87,10 @@ const MyNFTs: NextPage = () => {
               </div>
             </div>
           </div>
-          
+
           <MintCustomNFTForm />
         </div>
-        
+
         {/* Column 2: Airdrop */}
         <div className="flex flex-col gap-6 w-full">
           <AirdropMinter />

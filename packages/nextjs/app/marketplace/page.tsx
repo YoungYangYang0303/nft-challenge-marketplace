@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
@@ -42,12 +43,12 @@ const Marketplace = () => {
               try {
                 const tokenURI = await getTokenURI(l.nftContract, l.tokenId);
                 const metadata = await getMetadataFromIPFS(tokenURI);
-                
+
                 // Ensure image URL is valid for <img> tag
                 if (metadata.image && metadata.image.startsWith("ipfs://")) {
                   metadata.image = `https://gateway.pinata.cloud/ipfs/${metadata.image.replace("ipfs://", "")}`;
                 }
-                
+
                 return { ...l, ...metadata };
               } catch (err) {
                 console.warn(`Failed to load metadata for token ${l.tokenId}:`, err);
@@ -231,11 +232,7 @@ const Marketplace = () => {
               />
             </label>
           </div>
-          <select
-            className="select select-bordered w-full"
-            value={sort}
-            onChange={e => setSort(e.target.value)}
-          >
+          <select className="select select-bordered w-full" value={sort} onChange={e => setSort(e.target.value)}>
             <option value="price-asc">Price: Low to High</option>
             <option value="price-desc">Price: High to Low</option>
           </select>
@@ -258,22 +255,21 @@ const Marketplace = () => {
             <div className="fixed bottom-6 right-6 z-50 card bg-base-100 shadow-xl border border-primary p-4 flex flex-row items-center gap-4">
               <div>
                 <p className="font-bold">已选择 {selectedListingIds.length} 个 NFT</p>
-                <p className="text-sm">总价: {formatEther(selectedListingIds.reduce((acc, id) => {
-                  const l = listings.find(item => item.listingId === id);
-                  return acc + (l ? l.price : 0n);
-                }, 0n))} ETH</p>
+                <p className="text-sm">
+                  总价:{" "}
+                  {formatEther(
+                    selectedListingIds.reduce((acc, id) => {
+                      const l = listings.find(item => item.listingId === id);
+                      return acc + (l ? l.price : 0n);
+                    }, 0n),
+                  )}{" "}
+                  ETH
+                </p>
               </div>
-              <button 
-                className="btn btn-primary"
-                onClick={handleBatchBuy}
-                disabled={isBatchBuying}
-              >
+              <button className="btn btn-primary" onClick={handleBatchBuy} disabled={isBatchBuying}>
                 {isBatchBuying ? <span className="loading loading-spinner"></span> : "批量购买"}
               </button>
-              <button 
-                className="btn btn-ghost btn-sm"
-                onClick={() => setSelectedListingIds([])}
-              >
+              <button className="btn btn-ghost btn-sm" onClick={() => setSelectedListingIds([])}>
                 取消
               </button>
             </div>
@@ -281,20 +277,25 @@ const Marketplace = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {sortedAndFilteredListings.map(listing => (
               <div key={listing.tokenId} className="card bg-base-200 shadow-xl relative">
-                {connectedAddress && listing.seller.toLowerCase() !== connectedAddress.toLowerCase() && !listing.paused && (
-                  <input
-                    type="checkbox"
-                    className="checkbox checkbox-primary absolute top-2 left-2 z-10"
-                    checked={selectedListingIds.includes(listing.listingId)}
-                    onChange={e => handleSelectedChange(listing.listingId, e.target.checked)}
-                  />
-                )}
+                {connectedAddress &&
+                  listing.seller.toLowerCase() !== connectedAddress.toLowerCase() &&
+                  !listing.paused && (
+                    <input
+                      type="checkbox"
+                      className="checkbox checkbox-primary absolute top-2 left-2 z-10"
+                      checked={selectedListingIds.includes(listing.listingId)}
+                      onChange={e => handleSelectedChange(listing.listingId, e.target.checked)}
+                    />
+                  )}
                 {listing.paused && <div className="absolute top-2 right-2 badge badge-warning z-10">Paused</div>}
                 <figure>
-                  <img
+                  <Image
                     src={listing.image}
                     alt={listing.name}
+                    width={400}
+                    height={192}
                     className="w-full h-48 object-cover"
+                    unoptimized
                   />
                 </figure>
                 <div className="card-body p-4">
@@ -308,9 +309,7 @@ const Marketplace = () => {
                   </div>
                   <div className="card-actions justify-end mt-2">
                     {!connectedAddress ? (
-                      <button className="btn btn-primary btn-sm">
-                        Connect Wallet
-                      </button>
+                      <button className="btn btn-primary btn-sm">Connect Wallet</button>
                     ) : listing.seller.toLowerCase() === connectedAddress.toLowerCase() ? (
                       <span className="text-sm font-bold">Your Listing</span>
                     ) : (

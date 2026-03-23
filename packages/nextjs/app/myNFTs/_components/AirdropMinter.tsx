@@ -54,14 +54,14 @@ export const AirdropMinter = () => {
       // 1. Upload Image
       const uploadResult = await uploadFileToIPFS(imageFile);
       const imageCid = uploadResult.path || uploadResult.IpfsHash;
-      
+
       // 2. Create Metadata
       const metadata = {
         name,
         description,
         image: `ipfs://${imageCid}`,
       };
-      
+
       const metadataResult = await addToIPFS(metadata);
       const metadataCid = metadataResult.path || metadataResult.IpfsHash;
 
@@ -91,16 +91,16 @@ export const AirdropMinter = () => {
     try {
       const meta = await uploadAndCreateMetadata();
       if (recipients.length > 1) {
-        await writeContractAsync({ 
-          functionName: "airdropMint", 
+        await writeContractAsync({
+          functionName: "airdropMint",
           args: [recipients, meta],
           // @ts-ignore
         } as any);
         setProgress(recipients.length);
       } else {
-        await writeContractAsync({ 
-          functionName: "mintItem", 
-          args: [recipients[0], meta] 
+        await writeContractAsync({
+          functionName: "mintItem",
+          args: [recipients[0], meta],
         });
         setProgress(1);
       }

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Address as AddressType, formatEther, keccak256, parseEther, toHex, encodeAbiParameters } from "viem";
+import Image from "next/image";
+import { Address as AddressType, encodeAbiParameters, formatEther, keccak256, parseEther, toHex } from "viem";
 import { useAccount, useBlock } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
@@ -87,7 +88,7 @@ const AuctionCard = ({
   const { writeContractAsync: marketplaceWrite } = useScaffoldWriteContract("NFTMarketplace");
 
   const isSeller = connectedAddress && auction.seller.toLowerCase() === connectedAddress.toLowerCase();
-  
+
   // 使用区块时间作为基准
   const { data: block } = useBlock({ watch: true });
   const [now, setNow] = useState<bigint>(BigInt(Math.floor(Date.now() / 1000)));
@@ -125,16 +126,16 @@ const AuctionCard = ({
       // Solidity: keccak256(abi.encode(amount, secret, msg.sender))
       // amount: uint256, secret: bytes32, msg.sender: address
       const saltHex = toHex(salt, { size: 32 });
-      
+
       const encoded = encodeAbiParameters(
         [
-          { name: 'amount', type: 'uint256' },
-          { name: 'secret', type: 'bytes32' },
-          { name: 'bidder', type: 'address' }
+          { name: "amount", type: "uint256" },
+          { name: "secret", type: "bytes32" },
+          { name: "bidder", type: "address" },
         ],
-        [bidValue, saltHex, connectedAddress]
+        [bidValue, saltHex, connectedAddress],
       );
-      
+
       const hashedBid = keccak256(encoded);
 
       await marketplaceWrite({
@@ -215,7 +216,14 @@ const AuctionCard = ({
   return (
     <div className="card bg-base-100 shadow-xl">
       <figure>
-        <img src={auction.image} alt={auction.name} className="aspect-square object-cover" />
+        <Image
+          src={auction.image || ""}
+          alt={auction.name || "auction nft"}
+          width={400}
+          height={400}
+          className="aspect-square object-cover"
+          unoptimized
+        />
       </figure>
       <div className="card-body p-4">
         <h2 className="card-title">{auction.name}</h2>
@@ -224,9 +232,7 @@ const AuctionCard = ({
           <div>
             卖家: <Address address={auction.seller} size="xs" />
           </div>
-          <p>
-            最低出价: {formatEther(auction.minBid)} ETH
-          </p>
+          <p>最低出价: {formatEther(auction.minBid)} ETH</p>
         </div>
 
         <div className="mt-4 p-2 bg-base-200 rounded-lg text-center">
@@ -246,9 +252,7 @@ const AuctionCard = ({
           {auction.finalized && (
             <div>
               <p className="font-bold text-success">已结束</p>
-              <p>
-                最高出价: {formatEther(auction.highestBid)} ETH
-              </p>
+              <p>最高出价: {formatEther(auction.highestBid)} ETH</p>
               <p>
                 赢家: <Address address={auction.highestBidder} size="xs" />
               </p>

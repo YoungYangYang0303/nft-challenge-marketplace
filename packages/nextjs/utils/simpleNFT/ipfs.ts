@@ -1,12 +1,15 @@
 // TODO: 强烈建议把下面两个 key 放到 .env 文件中通过 process.env 读取，避免泄漏。
 const PINATA_API_KEY = process.env.NEXT_PUBLIC_PINATA_API_KEY || "254ee6f77e5b387d49fe"; // placeholder
-const PINATA_SECRET_API_KEY = process.env.NEXT_PUBLIC_PINATA_SECRET_API_KEY || process.env.PINATA_SECRET_API_KEY || "463137d7cae62df48196b56f322bc1fc06e77292fe17270cb4bd85e1518475c8"; // placeholder
+const PINATA_SECRET_API_KEY =
+  process.env.NEXT_PUBLIC_PINATA_SECRET_API_KEY ||
+  process.env.PINATA_SECRET_API_KEY ||
+  "463137d7cae62df48196b56f322bc1fc06e77292fe17270cb4bd85e1518475c8"; // placeholder
 
 const DEFAULT_MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
 
 export async function addFileToIPFS(
   file: File,
-  options: { fileName?: string; maxSizeBytes?: number } = {}
+  options: { fileName?: string; maxSizeBytes?: number } = {},
 ): Promise<{ IpfsHash: string; PinSize: number; Timestamp: string }> {
   if (!file) {
     throw new Error("No file provided for IPFS upload");

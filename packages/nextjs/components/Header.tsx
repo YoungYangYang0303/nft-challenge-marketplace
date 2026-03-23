@@ -1,7 +1,7 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import React, { useRef } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";

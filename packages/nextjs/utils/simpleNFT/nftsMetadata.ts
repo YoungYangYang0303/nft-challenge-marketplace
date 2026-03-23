@@ -142,7 +142,8 @@ const nftsMetadata = [
   {
     description: "A cute kitten",
     external_url: "https://austingriffith.com/portfolio/paintings/",
-    image: "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
+    image:
+      "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80",
     name: "Cat",
     attributes: [
       {

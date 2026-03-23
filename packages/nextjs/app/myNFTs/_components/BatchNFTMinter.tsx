@@ -44,18 +44,18 @@ export const BatchNFTMinter = () => {
         };
         const metadataResult = await addToIPFS(metadata);
         const metadataCid = metadataResult.path || metadataResult.IpfsHash;
-        
+
         uris.push(metadataCid);
       }
 
       notification.remove(notificationId);
-      
+
       // Batch Mint
       await writeContractAsync({
         functionName: "batchMintItem",
         args: [connectedAddress, uris],
       });
-      
+
       notification.success("批量铸造成功！");
     } catch (e) {
       console.error(e);
@@ -70,7 +70,7 @@ export const BatchNFTMinter = () => {
       <div className="card-body">
         <h2 className="card-title">批量铸造</h2>
         <p>自动生成并铸造指定数量的 NFT。</p>
-        
+
         <div className="form-control mb-4">
           <label className="label">
             <span className="label-text">铸造数量 (1-10)</span>
@@ -80,7 +80,7 @@ export const BatchNFTMinter = () => {
             min="1"
             max="10"
             value={mintAmount}
-            onChange={(e) => setMintAmount(parseInt(e.target.value) || 0)}
+            onChange={e => setMintAmount(parseInt(e.target.value) || 0)}
             className="input input-bordered w-full"
           />
         </div>

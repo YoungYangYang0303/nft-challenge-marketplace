@@ -16,8 +16,12 @@ const Home: NextPage = () => {
         <div className="px-5">
           <h1 className="text-center">
             <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">Scaffold-ETH 2</span>
-            <span className="block text-xl font-bold text-base-content/70">(SpeedRunEthereum Challenge: Simple NFT Example extension)</span>
+            <span className="block text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Scaffold-ETH 2
+            </span>
+            <span className="block text-xl font-bold text-base-content/70">
+              (SpeedRunEthereum Challenge: Simple NFT Example extension)
+            </span>
           </h1>
           <div className="flex justify-center items-center space-x-2 flex-col">
             <p className="my-2 font-medium">Connected Address:</p>

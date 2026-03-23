@@ -29,13 +29,13 @@ export const getMetadataFromIPFS = async (ipfsHash: string) => {
   try {
     const controller = new AbortController();
     const signal = controller.signal;
-    
-    const requests = IPFS_GATEWAYS.map(async (gateway) => {
-      const response = await fetch(`${gateway}${cid}`, { 
+
+    const requests = IPFS_GATEWAYS.map(async gateway => {
+      const response = await fetch(`${gateway}${cid}`, {
         signal,
-        method: 'GET',
+        method: "GET",
         // 设置较短的超时，避免挂起太久
-        next: { revalidate: 3600 } 
+        next: { revalidate: 3600 },
       });
       if (!response.ok) throw new Error(`Failed to fetch from ${gateway}`);
       return response.json();
@@ -43,10 +43,10 @@ export const getMetadataFromIPFS = async (ipfsHash: string) => {
 
     // Promise.any 会等待第一个成功的 Promise
     const result = await Promise.any(requests);
-    
+
     // 成功后取消其他正在进行的请求（虽然 fetch 的 abort 在某些环境不一定立即生效，但是个好习惯）
     controller.abort();
-    
+
     return result;
   } catch (error) {
     console.error("All IPFS gateways failed:", error);
@@ -99,8 +99,8 @@ const fetchFromApi = ({ path, method, body }: { path: string; method: string; bo
     },
     body: JSON.stringify(body),
   })
-    .then((response) => response.json())
-    .catch((error) => console.error("Error:", error));
+    .then(response => response.json())
+    .catch(error => console.error("Error:", error));
 };
 
 export const addToIPFS = (yourJSON: object) => fetchFromApi({ path: "/api/ipfs/add", method: "POST", body: yourJSON });
@@ -115,7 +115,7 @@ export const uploadFileToIPFS = (file: File, options: { fileName?: string } = {}
   return fetch("/api/ipfs/file", {
     method: "POST",
     body: formData,
-  }).then(async (response) => {
+  }).then(async response => {
     if (!response.ok) {
       const text = await response.text();
       throw new Error(text || "File upload failed");

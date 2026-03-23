@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { ListingOffers } from "./ListingOffers";
 import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
@@ -164,7 +165,14 @@ export const MyListings = () => {
             <div key={listing.tokenId} className="card bg-base-100 shadow-xl relative">
               {listing.paused && <div className="absolute top-2 right-2 badge badge-warning z-10">Paused</div>}
               <figure>
-                <img src={listing.image} alt={listing.name} className="w-full h-48 object-cover" />
+                <Image
+                  src={listing.image}
+                  alt={listing.name}
+                  width={400}
+                  height={192}
+                  className="w-full h-48 object-cover"
+                  unoptimized
+                />
               </figure>
               <div className="card-body p-4">
                 <h2 className="card-title text-lg">{listing.name}</h2>

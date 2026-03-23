@@ -37,7 +37,10 @@ export const ExcelBatchMinter = () => {
     setIsMinting(true);
     try {
       const text = await csvFile.text();
-      const rows = text.split("\n").map(row => row.trim()).filter(row => row);
+      const rows = text
+        .split("\n")
+        .map(row => row.trim())
+        .filter(row => row);
       // Assume header: name,description,filename
       // Skip header if it looks like a header
       let dataRows = rows;
@@ -51,7 +54,7 @@ export const ExcelBatchMinter = () => {
       for (let i = 0; i < dataRows.length; i++) {
         const columns = dataRows[i].split(",");
         if (columns.length < 3) continue;
-        
+
         const name = columns[0].trim();
         const description = columns[1].trim();
         const filename = columns[2].trim();
@@ -84,7 +87,7 @@ export const ExcelBatchMinter = () => {
           };
           const metadataResult = await addToIPFS(metadata);
           const metadataCid = metadataResult.path || metadataResult.IpfsHash;
-          
+
           uris.push(metadataCid);
         } catch (err) {
           console.error(err);
@@ -120,16 +123,18 @@ export const ExcelBatchMinter = () => {
             下载模板
           </button>
         </div>
-        <p className="text-sm text-base-content/70">上传 CSV 文件和对应的图片文件。CSV 格式: Name,Description,Filename</p>
+        <p className="text-sm text-base-content/70">
+          上传 CSV 文件和对应的图片文件。CSV 格式: Name,Description,Filename
+        </p>
         <div className="form-control">
           <label className="label">
             <span className="label-text">上传 CSV</span>
           </label>
-          <input 
-            type="file" 
-            accept=".csv" 
-            className="file-input file-input-bordered w-full" 
-            onChange={(e) => setCsvFile(e.target.files?.[0] || null)} 
+          <input
+            type="file"
+            accept=".csv"
+            className="file-input file-input-bordered w-full"
+            onChange={e => setCsvFile(e.target.files?.[0] || null)}
           />
         </div>
         <div className="form-control">
@@ -138,28 +143,25 @@ export const ExcelBatchMinter = () => {
             <span className="label-text-alt">
               {imageFiles.length > 0 ? `${imageFiles.length} 个文件已选择` : "未选择"}
               {imageFiles.length > 0 && (
-                <button 
-                  className="btn btn-xs btn-ghost text-error ml-2"
-                  onClick={() => setImageFiles([])}
-                >
+                <button className="btn btn-xs btn-ghost text-error ml-2" onClick={() => setImageFiles([])}>
                   清空
                 </button>
               )}
             </span>
           </label>
-          <input 
-            type="file" 
+          <input
+            type="file"
             multiple={true}
-            accept="image/*" 
-            className="file-input file-input-bordered w-full" 
-            onChange={(e) => {
+            accept="image/*"
+            className="file-input file-input-bordered w-full"
+            onChange={e => {
               if (e.target.files && e.target.files.length > 0) {
                 const newFiles = Array.from(e.target.files);
                 setImageFiles(prev => [...prev, ...newFiles]);
                 // Reset input value to allow selecting the same file again if needed
                 e.target.value = "";
               }
-            }} 
+            }}
           />
         </div>
         <div className="card-actions justify-end mt-4">
