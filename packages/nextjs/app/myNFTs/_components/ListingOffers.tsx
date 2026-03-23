@@ -1,9 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Offer } from "./types";
 import { formatEther } from "viem";
-import { useAccount } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
@@ -16,8 +14,6 @@ export const ListingOffers = ({
   onAccept: (offerIndex: number, offer: Offer) => void;
   isAccepting: boolean;
 }) => {
-  const { address: connectedAddress } = useAccount();
-
   const { data: offersData, isLoading } = useScaffoldReadContract({
     contractName: "NFTMarketplace",
     functionName: "getOffers",
@@ -51,11 +47,7 @@ export const ListingOffers = ({
                 Expires: {new Date(Number(offer.expiration) * 1000).toLocaleString()}
               </p>
             </div>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => onAccept(index, offer)}
-              disabled={isAccepting}
-            >
+            <button className="btn btn-primary btn-sm" onClick={() => onAccept(index, offer)} disabled={isAccepting}>
               {isAccepting ? "处理中..." : "接受"}
             </button>
           </div>

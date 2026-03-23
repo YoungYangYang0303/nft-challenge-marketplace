@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Listing } from "./types";
 import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
-import { Address, AddressInput, Balance } from "~~/components/scaffold-eth";
+import { Address, AddressInput } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -163,12 +163,12 @@ export const NFTCard = ({
           height={400}
           className="aspect-square object-cover rounded-xl"
           unoptimized={true}
-          onError={(e) => {
+          onError={e => {
             const img = e.target as HTMLImageElement;
             // 如果 Pinata 失败，尝试切换到 ipfs.io
             if (img.src.includes("gateway.pinata.cloud/ipfs/")) {
               img.src = img.src.replace("gateway.pinata.cloud/ipfs/", "ipfs.io/ipfs/");
-            } 
+            }
             // 如果 ipfs.io 也失败，尝试 dweb.link
             else if (img.src.includes("ipfs.io/ipfs/")) {
               img.src = img.src.replace("ipfs.io/ipfs/", "dweb.link/ipfs/");
@@ -194,7 +194,7 @@ export const NFTCard = ({
               {attr.trait_type}: {attr.value}
             </div>
           ))}
-      </div>
+        </div>
 
         <div className="card-actions justify-between items-center mt-4">
           <div className="flex flex-col">

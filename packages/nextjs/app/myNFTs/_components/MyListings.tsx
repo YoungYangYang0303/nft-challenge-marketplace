@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { NFTCard } from "./NFTCard";
 import { ListingOffers } from "./ListingOffers";
-import { Offer } from "./types";
 import { formatEther, parseEther } from "viem";
 import { useAccount } from "wagmi";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
@@ -15,7 +13,7 @@ export const MyListings = () => {
   const { address: connectedAddress } = useAccount();
   const [myListings, setMyListings] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   // State for updating price
   const [editingListingId, setEditingListingId] = useState<bigint | null>(null);
   const [newPrice, setNewPrice] = useState("");
@@ -51,7 +49,7 @@ export const MyListings = () => {
         try {
           // Filter listings where seller is the connected user
           const userListings = (allListingsData as any[]).filter(
-            (l: any) => l.seller.toLowerCase() === connectedAddress.toLowerCase()
+            (l: any) => l.seller.toLowerCase() === connectedAddress.toLowerCase(),
           );
 
           const listingsWithMetadata = await Promise.all(
@@ -59,12 +57,12 @@ export const MyListings = () => {
               try {
                 const tokenURI = await getTokenURI(l.nftContract, l.tokenId);
                 const metadata = await getMetadataFromIPFS(tokenURI);
-                
+
                 // Ensure image URL is valid for <img> tag
                 if (metadata.image && metadata.image.startsWith("ipfs://")) {
                   metadata.image = `https://gateway.pinata.cloud/ipfs/${metadata.image.replace("ipfs://", "")}`;
                 }
-                
+
                 return { ...l, ...metadata };
               } catch (err) {
                 console.warn(`Failed to load metadata for token ${l.tokenId}:`, err);
@@ -166,11 +164,7 @@ export const MyListings = () => {
             <div key={listing.tokenId} className="card bg-base-100 shadow-xl relative">
               {listing.paused && <div className="absolute top-2 right-2 badge badge-warning z-10">Paused</div>}
               <figure>
-                <img
-                  src={listing.image}
-                  alt={listing.name}
-                  className="w-full h-48 object-cover"
-                />
+                <img src={listing.image} alt={listing.name} className="w-full h-48 object-cover" />
               </figure>
               <div className="card-body p-4">
                 <h2 className="card-title text-lg">{listing.name}</h2>
@@ -181,7 +175,7 @@ export const MyListings = () => {
                 <div className="card-actions justify-end mt-2 flex-col gap-2">
                   <ListingOffers
                     listingId={listing.listingId}
-                    onAccept={(index) => handleAcceptOffer(listing.listingId, index)}
+                    onAccept={index => handleAcceptOffer(listing.listingId, index)}
                     isAccepting={isAcceptingOffer}
                   />
                   {editingListingId === listing.listingId ? (
@@ -194,13 +188,13 @@ export const MyListings = () => {
                         onChange={e => setNewPrice(e.target.value)}
                       />
                       <div className="flex gap-2">
-                        <button 
+                        <button
                           className="btn btn-primary btn-sm flex-1"
                           onClick={() => handleUpdatePrice(listing.listingId)}
                         >
                           Confirm
                         </button>
-                        <button 
+                        <button
                           className="btn btn-ghost btn-sm flex-1"
                           onClick={() => {
                             setEditingListingId(null);
@@ -212,7 +206,7 @@ export const MyListings = () => {
                       </div>
                     </div>
                   ) : (
-                    <button 
+                    <button
                       className="btn btn-info btn-sm w-full"
                       onClick={() => {
                         setEditingListingId(listing.listingId);
@@ -225,21 +219,21 @@ export const MyListings = () => {
                   )}
 
                   {listing.paused ? (
-                    <button 
+                    <button
                       className="btn btn-success btn-sm w-full"
                       onClick={() => handleResumeListing(listing.listingId)}
                     >
                       Resume
                     </button>
                   ) : (
-                    <button 
+                    <button
                       className="btn btn-warning btn-sm w-full"
                       onClick={() => handlePauseListing(listing.listingId)}
                     >
                       Pause
                     </button>
                   )}
-                  <button 
+                  <button
                     className="btn btn-error btn-sm w-full"
                     onClick={() => handleCancelListing(listing.listingId)}
                   >

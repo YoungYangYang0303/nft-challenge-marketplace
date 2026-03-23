@@ -1,7 +1,8 @@
 "use client";
 
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { NFTCard } from "./NFTCard";
+import { Collectible } from "./types";
 import { parseEther } from "viem";
 import { useAccount } from "wagmi";
 import {
@@ -13,7 +14,6 @@ import {
 import { notification } from "~~/utils/scaffold-eth";
 import { getMetadataFromIPFS } from "~~/utils/simpleNFT/ipfs-fetch";
 import nftsMetadata, { NFTMetaData } from "~~/utils/simpleNFT/nftsMetadata";
-import { Collectible } from "./types";
 
 export const MyHoldings = () => {
   const { address: connectedAddress } = useAccount();
@@ -33,15 +33,13 @@ export const MyHoldings = () => {
   const { data: yourCollectibleContract } = useScaffoldContract({
     contractName: "YourCollectible",
   });
-  const { writeContractAsync: marketplaceWrite, isMining: isMarketplaceMining } = useScaffoldWriteContract({
+  const { writeContractAsync: marketplaceWrite } = useScaffoldWriteContract({
     contractName: "NFTMarketplace",
   });
-  const { writeContractAsync: collectibleWrite, isMining: isCollectibleMining } = useScaffoldWriteContract({
+  const { writeContractAsync: collectibleWrite } = useScaffoldWriteContract({
     contractName: "YourCollectible",
   });
   const { data: marketplaceInfo } = useDeployedContractInfo({ contractName: "NFTMarketplace" });
-
-
 
   const { data: myTotalBalance } = useScaffoldReadContract({
     contractName: "YourCollectible",
@@ -60,7 +58,7 @@ export const MyHoldings = () => {
       }
 
       setAllCollectiblesLoading(true);
-      
+
       const totalBalance = parseInt(myTotalBalance.toString());
       if (totalBalance === 0) {
         if (isMounted) {
@@ -72,13 +70,16 @@ export const MyHoldings = () => {
 
       // 并行获取所有 Token ID
       const tokenIndices = Array.from({ length: totalBalance }, (_, i) => i);
-      
+
       try {
         const fetchTokenData = async (tokenIndex: number) => {
           try {
-            const tokenId = await yourCollectibleContract.read.tokenOfOwnerByIndex([connectedAddress, BigInt(tokenIndex)]);
+            const tokenId = await yourCollectibleContract.read.tokenOfOwnerByIndex([
+              connectedAddress,
+              BigInt(tokenIndex),
+            ]);
             const tokenURI = await yourCollectibleContract.read.tokenURI([tokenId]);
-            
+
             let ipfsHash = tokenURI;
             // 移除可能的硬编码前缀，提取 CID
             if (tokenURI.startsWith("https://gateway.pinata.cloud/ipfs/")) {
@@ -88,7 +89,7 @@ export const MyHoldings = () => {
             }
 
             let nftMetadata: NFTMetaData | undefined = undefined;
-            
+
             // 尝试获取 Metadata (并行竞速)
             if (ipfsHash.length >= 10) {
               try {
@@ -118,17 +119,17 @@ export const MyHoldings = () => {
         // 使用分批处理来限制并发请求，避免触发 IPFS 网关的限流 (429 Too Many Requests)
         const results: (Collectible | null)[] = [];
         const batchSize = 3; // 每次并发 3 个请求
-        
+
         for (let i = 0; i < tokenIndices.length; i += batchSize) {
           const batch = tokenIndices.slice(i, i + batchSize);
           const batchResults = await Promise.all(batch.map(fetchTokenData));
           results.push(...batchResults);
           // 批次之间稍微暂停一下
           if (i + batchSize < tokenIndices.length) {
-             await new Promise(resolve => setTimeout(resolve, 200));
+            await new Promise(resolve => setTimeout(resolve, 200));
           }
         }
-        
+
         if (isMounted) {
           const validCollectibles = results.filter((c): c is Collectible => c !== null);
           validCollectibles.sort((a, b) => a.id - b.id);
@@ -142,7 +143,7 @@ export const MyHoldings = () => {
     };
 
     updateMyCollectibles();
-    
+
     return () => {
       isMounted = false;
     };
@@ -153,12 +154,6 @@ export const MyHoldings = () => {
     const t = setTimeout(() => setDebouncedSearchTerm(searchTerm.trim()), 300);
     return () => clearTimeout(t);
   }, [searchTerm]);
-
-
-
-
-
-
 
   const filteredCollectibles = useMemo(() => {
     const term = debouncedSearchTerm.toLowerCase();
@@ -188,22 +183,24 @@ export const MyHoldings = () => {
 
   const handleBatchBurn = async () => {
     if (selectedTokenIds.length === 0) return;
-    
+
     if (!window.confirm(`确定要销毁这 ${selectedTokenIds.length} 个 NFT 吗？此操作不可逆！`)) {
       return;
     }
 
     setIsBatchBurning(true);
-    const notificationId = notification.loading(`正在销毁 ${selectedTokenIds.length} 个 NFT... (请在钱包中确认每一笔交易)`);
-    
+    const notificationId = notification.loading(
+      `正在销毁 ${selectedTokenIds.length} 个 NFT... (请在钱包中确认每一笔交易)`,
+    );
+
     try {
       for (const id of selectedTokenIds) {
-         await collectibleWrite({
+        await collectibleWrite({
           functionName: "burn",
           args: [BigInt(id)],
         });
       }
-      
+
       notification.remove(notificationId);
       notification.success("批量销毁成功！");
       setSelectedTokenIds([]);
@@ -233,11 +230,14 @@ export const MyHoldings = () => {
     setIsBatchListing(true);
     try {
       const price = parseEther(batchListPrice);
-      
+
       // 1. Approve Marketplace for all selected tokens (or setApprovalForAll)
       // Check if already approved for all
-      const isApprovedForAll = await yourCollectibleContract.read.isApprovedForAll([connectedAddress, marketplaceInfo.address]);
-      
+      const isApprovedForAll = await yourCollectibleContract.read.isApprovedForAll([
+        connectedAddress,
+        marketplaceInfo.address,
+      ]);
+
       if (!isApprovedForAll) {
         const notificationId = notification.loading("正在授权市场合约...");
         await collectibleWrite({
@@ -255,7 +255,7 @@ export const MyHoldings = () => {
       });
       notification.remove(notificationId);
       notification.success("批量上架成功！");
-      
+
       setSelectedTokenIds([]);
       setBatchListPrice("");
     } catch (e) {
@@ -306,24 +306,17 @@ export const MyHoldings = () => {
             value={batchListPrice}
             onChange={e => setBatchListPrice(e.target.value)}
           />
-          <button 
-            className="btn btn-primary btn-sm"
-            onClick={handleBatchList}
-            disabled={isBatchListing}
-          >
+          <button className="btn btn-primary btn-sm" onClick={handleBatchList} disabled={isBatchListing}>
             {isBatchListing ? <span className="loading loading-spinner loading-xs"></span> : "批量上架"}
           </button>
-          <button 
+          <button
             className="btn btn-secondary btn-sm"
             onClick={handleBatchBurn}
             disabled={isBatchBurning || isBatchListing}
           >
             {isBatchBurning ? <span className="loading loading-spinner loading-xs"></span> : "批量销毁"}
           </button>
-          <button 
-            className="btn btn-ghost btn-sm"
-            onClick={() => setSelectedTokenIds([])}
-          >
+          <button className="btn btn-ghost btn-sm" onClick={() => setSelectedTokenIds([])}>
             取消选择
           </button>
         </div>
@@ -335,7 +328,7 @@ export const MyHoldings = () => {
         </div>
       ) : (
         <>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {paginatedCollectibles.map(item => (
               <NFTCard
                 nft={item}

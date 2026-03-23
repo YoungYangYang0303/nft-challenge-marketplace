@@ -3,9 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 
 const deployMarketplace: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await hre.getNamedAccounts();
-  const { deploy, get } = hre.deployments;
-
-  const yourCollectibleDeployment = await get("YourCollectible");
+  const { deploy } = hre.deployments;
 
   await deploy("NFTMarketplace", {
     from: deployer,

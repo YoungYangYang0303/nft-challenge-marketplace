@@ -1,18 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { createWalletClient, http, parseEther } from "viem";
 import { hardhat } from "viem/chains";
 import { useAccount } from "wagmi";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { useTransactor } from "~~/hooks/scaffold-eth";
 import { useWatchBalance } from "~~/hooks/scaffold-eth/useWatchBalance";
+import scaffoldConfig from "~~/scaffold.config";
 
 // Number of ETH faucet sends to an address
 const NUM_OF_ETH = "1";
 const FAUCET_ADDRESS = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
 
-const override = scaffoldConfig.rpcOverrides?.[hardhat.id];
+const override = (scaffoldConfig.rpcOverrides as Record<number, string> | undefined)?.[hardhat.id];
 const localWalletClient = createWalletClient({
   chain: hardhat,
   transport: override ? http(override) : http(),
@@ -74,4 +75,3 @@ export const FaucetButton = () => {
     </div>
   );
 };
-import scaffoldConfig from "~~/scaffold.config";
